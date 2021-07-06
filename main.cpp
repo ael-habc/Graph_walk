@@ -10,33 +10,30 @@ class graphe
 {
 public:
     int index;
-    std::string letter;
+    std::string name;
     int adj[3];
-    graphe(int index, std::string letter);
+    graphe(int index, std::string name);
     ~graphe();
     void print();
 };
 
-graphe::graphe(int index, std::string letter) : index(index), letter(letter)
+graphe::graphe(int index, std::string name) : index(index), name(name)
 {
     this->adj[0] = -1;
     this->adj[1] = -1;
     this->adj[2] = -1;
 }
 
-graphe::~graphe()
-{
-
-}
+graphe::~graphe(){}
 
 void graphe::print()
 {
-    std::cout << index << ", " << letter << ", " << adj[0] << ", " << adj[1] << ", " << adj[2] << std::endl;
+    std::cout << index << ", " << name << ", " << adj[0] << ", " << adj[1] << ", " << adj[2] << std::endl;
 }
 
-void add_node(std::vector<graphe> &g, int index, std::string letter)
+void add_node(std::vector<graphe> &g, int index, std::string name)
 {
-    graphe node(index, letter);
+    graphe node(index, name);
     g.push_back(node);
 }
 
@@ -68,7 +65,7 @@ int get_index(std::vector<graphe> g, int index, char c2)
         return (-1);
     for (int i = 0; i < 3; i++)
     {
-        if (g[g[index].adj[i]].letter == v2)
+        if (g[g[index].adj[i]].name == v2)
             return (g[index].adj[i]);
     }
     return (-1);
@@ -78,21 +75,21 @@ int get_first_index(std::vector<graphe> g,char c1, char c2)
 {
     std::string v1;
     std::string v2;
-    int index;
     int i;
 
     v1.push_back(c1);
     v2.push_back(c2);
-    for (i = 0; g[i].letter != v1; i++)
+    for (i = 0; g[i].name != v1 && i < g.size(); i++)
         ;
-    index = get_index(g, i, c2);
-    std::cout << "index " << index << std::endl;
-    if (index != -1)
-        return (get_index(g, index, c1));
-    for (i = 0; g[i].letter != v1; i++)
+    if (i == g.size())
+        return (-1);
+    if (get_index(g, i, c2) != -1)
+        return (i);
+    for (i = 0; g[i].name != v1; i++)
         ;
-    index = get_index(g, i, c2);
-    return (get_index(g, index, c1));
+    if (get_index(g, i, c2 != -1))
+        return (i);
+    return (-1);
 }
 
 void get_walk(std::vector<graphe> g, std::string path)
@@ -105,10 +102,11 @@ void get_walk(std::vector<graphe> g, std::string path)
     std::cout << "path " << path << std::endl;
     for (i = 0; path[i] == path[i + 1] && i + 1 < path.length(); i++)
         ;
-    std::cout << "first char index " << i << std::endl;
+    if(i == path.length() -1)
+        i = 0;
     start = i;
     index = get_first_index(g, path[i], path[i + 1]);
-    std::cout << index << std::endl;
+    walk.push_back(index);
     for (; i + 1 < path.length(); i++)
     {
         next = get_index(g, index,  path[i + 1]);
@@ -121,13 +119,13 @@ void get_walk(std::vector<graphe> g, std::string path)
         }
         index = next;
     }
-    i = start + 1;
-    index = get_first_index(g, path[i], path[i - 1]);
+    i = start;
+    index = get_first_index(g, path[i], path[i - 1]); 
     for (; i - 1 >= 0; i--)
     {
         next = get_index(g, index,  path[i - 1]);
         if (next != -1)
-            walk.insert(walk.begin(), next);
+            walk.insert(walk.begin(), next); // g.push_front(next)
         else
         {
             std::cout << -1 << std::endl;
@@ -135,11 +133,14 @@ void get_walk(std::vector<graphe> g, std::string path)
         }
         index = next;
     }
-    for (i = 0; i < walk.size(); i++)
+    std::cout << "(";
+    for (i = 0; i < walk.size() - 1; i++)
         std::cout << walk[i] << ", ";
-    std::cout << std::endl;
+    std::cout << walk[i] << ")" << std::endl;
     
 }
+
+
 
 int main()
 {
@@ -153,8 +154,6 @@ int main()
         add_node(g, i, Vertices[i]);
     for(int i = 0; Edges[i][0] != -1; i++)
         add_edge(g, Edges[i][0], Edges[i][1]);
-    // for (int i = 0; i < 10; i++)
-    //     g[i].print();
-    get_walk(g, "AAAB");
+    get_walk(g, "AABBBBBB");
     return 0;
 }
